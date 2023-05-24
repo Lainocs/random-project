@@ -24,5 +24,8 @@ jobs:
       - name: Build project
         run: cd front && npm run build
 
-      - name: Update composer dependencies
-        run: cd back && composer update --no-dev
+      - name: Install composer dependencies
+        run: cd back && composer install --no-dev
+
+      - name: Audit composer dependencies
+        run: cd back && composer audit
