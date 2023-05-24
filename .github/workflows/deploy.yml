@@ -29,8 +29,19 @@ jobs:
       - name: Build project
         run: cd front && npm run build
 
-      - name: Install composer dependencies
-        run: cd back && composer install --no-dev
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          script: |
+            cd /var/www/random.papacastor.fr
+            git pull
+            scp -r front/build/* ./front/build/
+            cd back
+            composer install
+            php bin/console doctrine:migrations:migrate --no-interaction
+            php bin/console cache:clear
 
-      - name: Audit composer dependencies
-        run: cd back && composer audit
