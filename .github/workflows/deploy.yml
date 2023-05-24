@@ -29,7 +29,17 @@ jobs:
       - name: Build project
         run: cd front && npm run build
 
-      - name: Deploy over SSH
+      - name: Copy build to server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
+          port: ${{ secrets.PORT }}
+          source: "front/build"
+          target: "/var/www/random.papacastor.fr"
+
+      - name: install composer dependencies in vps ssh
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
@@ -37,11 +47,5 @@ jobs:
           key: ${{ secrets.KEY }}
           port: ${{ secrets.PORT }}
           script: |
-            cd /var/www/random.papacastor.fr
-            git pull
-            scp -r front/build/* ./front/build/
-            cd back
+            cd /var/www/random.papacastor.fr/back
             composer install
-            php bin/console doctrine:migrations:migrate --no-interaction
-            php bin/console cache:clear
-
