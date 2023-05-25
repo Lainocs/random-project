@@ -26,6 +26,10 @@ jobs:
       - name: Install dependencies
         run: cd front && npm install
 
+      - name: Create env.local file
+        run: |
+          echo "REACT_APP_NAME=${{ secrets.API_URL }}" > front/.env.local
+
       - name: Build project
         run: cd front && npm run build
 
